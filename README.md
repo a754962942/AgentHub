@@ -118,3 +118,34 @@ print("File writing complete.")
 
 
 **注意:** 在使用 `open()` 函数时，务必在完成写操作后关闭文件，以确保数据被正确保存。 使用 `with open()` 语句可以自动处理文件关闭，更安全便捷。
+
+
+
+
+
+
+### GDP of China from 2013 to 2023
+
+| Year | GDP (in billion USD) |
+|------|----------------------|
+| 2013 | 9,240.27             |
+| 2014 | 10,354.80            |
+| 2015 | 11,007.72            |
+| 2016 | 11,199.15            |
+| 2017 | 12,237.70            |
+| 2018 | 13,608.15            |
+| 2019 | 14,342.90            |
+| 2020 | 14,859.50            |
+| 2021 | 17,734.07            |
+| 2022 | 18,000.00            |
+| 2023 | 17,794.78            |
+
+**Note:** The data for 2023 is based on the latest available information and may be subject to revision.
+
+**Sources:**
+- Trading Economics
+- Statista
+- MacroTrends
+- National Bureau of Statistics of China
+
+This table provides a comprehensive overview of China's GDP from 2013 to 2023, showing the economic growth and fluctuations over the decade.
