@@ -1,17 +1,13 @@
 import functools
-import io
 import operator
 import os
 from typing import Annotated, TypedDict, Sequence, Literal
-from PIL import Image
-from kubernetes.stream import stream
-
+from langchain_openai import ChatOpenAI
 from langchain_core.messages import AIMessage, ToolMessage, BaseMessage, HumanMessage
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.tools import  tool
 from langchain_community.tools import TavilySearchResults
 from langchain_experimental.utilities import PythonREPL
-from  langchain_mistralai import ChatMistralAI
 from langgraph.graph import MessagesState, StateGraph
 from langgraph.prebuilt import ToolNode
 from tabulate import tabulate
@@ -22,8 +18,8 @@ os.environ["LANGCHAIN_TRACING_V2"]="true"
 os.environ["LANGCHAIN_PROJECT"]="ChatBot"
 os.environ["SERPER_API_KEY"] = os.getenv("SERPER_API_KEY")
 os.environ["MISTRAL_API_KEY"] = os.getenv("MISTRAL_API_KEY")
-
-
+deepSeekKey=os.getenv("DEEPSEEK_API_KEY")
+os.environ["OPENAI_API_KEY"] = os.getenv("DEEPSEEK_API_KEY")
 #tool 定义
 tavily_tool=TavilySearchResults(max_result=3)
 repl=PythonREPL()
@@ -102,13 +98,12 @@ def agent_node(state,agent,name):
         "sender":name,
     }
 # 准备llm
-research_llm=ChatMistralAI(model="mistral-large-latest",temperature=0,max_retries=2)
-table_llm= ChatMistralAI(model="mistral-large-latest",temperature=0,max_retries=2)
+research_llm=ChatOpenAI(model="deepseek-chat",api_key=deepSeekKey,base_url="https://api.deepseek.com/v1",temperature=0,max_retries=2)
+table_llm= ChatOpenAI(model="deepseek-chat",api_key=deepSeekKey,base_url="https://api.deepseek.com/v1",temperature=0,max_retries=2)
 # 准备agent
 research_agent=create_agent(research_llm,[tavily_tool],system_message='Before using the search engine,carefully think through and clarify the query.'
-                                                              "Then,conduct a single search that addresses all aspects of the query in one go."
-                                                              "You should Collect information and convert it into json format,Process the acquired data.Do not reply more information besides process data  ")
-table_agent=create_agent(table_llm,[table_tool],"create clear and user-friendly table based on the provided data.If data format isn't u need,please conversion it."
+                                                              "Then,conduct a single search that addresses all aspects of the query in one go.")
+table_agent=create_agent(table_llm,[python_repl],"create clear and user-friendly python code to generate table based on the provided data.If data format isn't you need,please conversion it."
                          "Before use the tool, you must makesure data format is good for generate table tool."
                          "such as data = [['Name', 'Age', 'City'],['Alice', 25, 'New York']]"
                          "data:A list containing the tabular data. Each sublist represents a row, and the data is arranged in column order.")
@@ -195,7 +190,8 @@ events =app.stream(
     {
 "messages": [
             HumanMessage(
-                content="Obtain the GDP of  china  from 2013 to 2023,and then plot a table with data.end the task after generating the table"
+                content="Obtain the GDP of China from 2010 to 2023, "
+            "and then generate a table  with Python tabulate. End the task after generating the table。"
             )
         ],
     },
